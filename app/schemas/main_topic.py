@@ -1,14 +1,12 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
-from .level import LevelResponse
 
 
 class MainTopicBase(BaseModel):
     """MainTopic 기본 스키마"""
     title: str
     description: Optional[str] = None
-    level_id: int
     is_active: bool = True
 
 
@@ -21,7 +19,6 @@ class MainTopicUpdate(BaseModel):
     """MainTopic 업데이트 스키마"""
     title: Optional[str] = None
     description: Optional[str] = None
-    level_id: Optional[int] = None
     is_active: Optional[bool] = None
 
 
@@ -34,12 +31,6 @@ class MainTopicResponse(MainTopicBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class MainTopicWithLevel(MainTopicResponse):
-    """MainTopic with Level 응답 스키마"""
-    level: LevelResponse
-
-
 class MainTopicWithStats(MainTopicResponse):
     """MainTopic 통계 포함 응답 스키마"""
     curated_sub_topics_count: int = 0
-    level: LevelResponse

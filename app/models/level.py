@@ -17,7 +17,6 @@ class Level(Base):
     order = Column(Integer, nullable=False, index=True)
 
     # 관계 설정
-    main_topics = relationship("MainTopic", back_populates="level", cascade="all, delete-orphan")
     curated_sub_topics = relationship("CuratedSubTopic", back_populates="level", cascade="all, delete-orphan")
 
     class Config:

@@ -98,11 +98,11 @@ GET /main-topics?category=tech&popular=true&limit=20
       "total_learners": 15420,
       "avg_completion_rate": 0.73,
       "estimated_learning_time": "4-6주",
-      "difficulty_range": ["absolute_beginner", "expert"],
       "subtopic_count": {
         "curated": 12,
         "generated": 156
-      }
+      },
+      "note": "대주제는 난이도가 없으며, 소주제가 각각 난이도를 가집니다"
     }
   ],
   "meta": {
@@ -115,10 +115,10 @@ GET /main-topics?category=tech&popular=true&limit=20
 
 ### 3.3 소주제 생성 및 조회
 
-**큐레이션 소주제 조회**
+**큐레이션 소주제 조회** (난이도별 필터링 가능)
 
 ```http
-GET /sub-topics/curated?main_slug=ai-ml&level=intermediate&limit=10
+GET /sub-topics/curated?main_topic_id=1&level_id=3&limit=10
 ```
 
 ```json
@@ -127,6 +127,7 @@ GET /sub-topics/curated?main_slug=ai-ml&level=intermediate&limit=10
     {
       "id": "curated_1",
       "main_topic_id": 1,
+      "level_id": 3,
       "slug": "transformers-architecture",
       "name": "트랜스포머 아키텍처",
       "description": "Attention 메커니즘과 인코더-디코더 구조",
@@ -134,7 +135,12 @@ GET /sub-topics/curated?main_slug=ai-ml&level=intermediate&limit=10
       "quality_score": 0.96,
       "usage_count": 1250,
       "avg_rating": 4.3,
-      "learning_outcomes": ["Self-attention 이해", "BERT/GPT 구조 파악"]
+      "learning_outcomes": ["Self-attention 이해", "BERT/GPT 구조 파급"],
+      "level": {
+        "code": "intermediate",
+        "name": "중급자",
+        "description": "기초 지식을 바탕으로 심화 학습하는 단계"
+      }
     }
   ]
 }
@@ -440,7 +446,7 @@ CREATE TABLE levels (
     order_num INTEGER UNIQUE
 );
 
--- 대주제
+-- 대주제 (난이도 없음 - 소주제만 난이도를 가짐)
 CREATE TABLE main_topics (
     id SERIAL PRIMARY KEY,
     slug VARCHAR(50) UNIQUE NOT NULL,
@@ -454,10 +460,11 @@ CREATE TABLE main_topics (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 큐레이션 소주제
+-- 큐레이션 소주제 (난이도 정보 포함)
 CREATE TABLE curated_sub_topics (
     id SERIAL PRIMARY KEY,
     main_topic_id INTEGER REFERENCES main_topics(id) ON DELETE CASCADE,
+    level_id INTEGER REFERENCES levels(id) NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL,
     name VARCHAR(200) NOT NULL,
     description TEXT,
