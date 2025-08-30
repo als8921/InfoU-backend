@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 
 # API 라우터들
-from app.api import health, levels
+from app.api import health, levels, debug, web
 
 app = FastAPI(
     title=settings.app_name,
@@ -23,16 +23,12 @@ app.add_middleware(
 )
 
 # API 라우터 등록
+app.include_router(web.router)  # 웹 인터페이스를 먼저 등록
 app.include_router(health.router)
 app.include_router(levels.router)
+app.include_router(debug.router)
 
-@app.get("/")
-async def root():
-    return {
-        "message": f"{settings.app_name} v{settings.app_version}에 오신 것을 환영합니다!",
-        "docs": "/docs",
-        "health": "/health"
-    }
+# 루트 경로는 web.router에서 처리
 
 if __name__ == "__main__":
     import uvicorn
