@@ -1,20 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from pydantic_settings import BaseSettings
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-class Settings(BaseSettings):
-    # SQLite를 기본 데이터베이스로 사용
-    database_url: str = os.getenv("DATABASE_URL", "sqlite:///./infou.db")
-    
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
+from app.config import settings
 
 # SQLite 데이터베이스 엔진 생성
 engine = create_engine(
