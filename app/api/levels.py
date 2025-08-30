@@ -32,7 +32,6 @@ async def get_levels_with_stats(db: Session = Depends(get_db)) -> List[LevelWith
     
     for level in levels:
         main_topics_count = db.query(MainTopic).filter(
-            MainTopic.level_id == level.id,
             MainTopic.is_active == True
         ).count()
         
