@@ -1,789 +1,972 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InfoU Database Admin Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --toss-blue: #0064FF;
-            --toss-light-blue: #E5F2FF;
-            --toss-red: #FF5A5A;
-            --toss-light-red: #FFEBEB;
-            --toss-gray-900: #191F28;
-            --toss-gray-800: #333D4B;
-            --toss-gray-700: #4E5968;
-            --toss-gray-600: #6B7684;
-            --toss-gray-500: #8B95A1;
-            --toss-gray-400: #B0B8C1;
-            --toss-gray-300: #C9CDD2;
-            --toss-gray-200: #E5E8EB;
-            --toss-gray-100: #F2F4F6;
-            --toss-gray-50: #F9FAFB;
-            --white: #FFFFFF;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-            background-color: var(--toss-gray-50);
-            color: var(--toss-gray-900);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-        
-        .header {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--toss-gray-200);
-        }
-        
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--toss-gray-900);
-            margin-bottom: 8px;
-        }
-        
-        .header p {
-            font-size: 16px;
-            color: var(--toss-gray-600);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: var(--white);
-            border: 1px solid var(--toss-gray-200);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        
-        .stat-card:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-            transform: translateY(-1px);
-        }
-        
-        .stat-card h3 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--toss-blue);
-            margin-bottom: 4px;
-        }
-        
-        .stat-card p {
-            font-size: 14px;
-            color: var(--toss-gray-600);
-        }
-        
-        .section {
-            background: var(--white);
-            border: 1px solid var(--toss-gray-200);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
-        }
-        
-        .section h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--toss-gray-900);
-            margin-bottom: 24px;
-        }
-        
-        .table-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .table-card {
-            background: var(--toss-gray-50);
-            border: 1px solid var(--toss-gray-200);
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .table-card:hover {
-            background: var(--toss-light-blue);
-            border-color: var(--toss-blue);
-            transform: translateY(-1px);
-        }
-        
-        .table-card.selected {
-            background: var(--toss-light-blue);
-            border-color: var(--toss-blue);
-        }
-        
-        .table-card h4 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--toss-gray-900);
-            margin-bottom: 4px;
-        }
-        
-        .table-card .row-count {
-            font-size: 14px;
-            color: var(--toss-gray-600);
-        }
-        
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-primary {
-            background: var(--toss-blue);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: #0052CC;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: var(--toss-gray-100);
-            color: var(--toss-gray-700);
-            border: 1px solid var(--toss-gray-300);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--toss-gray-200);
-            transform: translateY(-1px);
-        }
-        
-        .btn-danger {
-            background: var(--toss-red);
-            color: var(--white);
-        }
-        
-        .btn-danger:hover {
-            background: #E54545;
-            transform: translateY(-1px);
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: var(--white);
-            border: 1px solid var(--toss-gray-200);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .data-table th,
-        .data-table td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--toss-gray-200);
-        }
-        
-        .data-table th {
-            background: var(--toss-gray-50);
-            color: var(--toss-gray-800);
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .data-table td {
-            font-size: 14px;
-            color: var(--toss-gray-700);
-        }
-        
-        .data-table tbody tr:hover {
-            background: var(--toss-gray-50);
-        }
-        
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .json-display {
-            background: var(--toss-gray-50);
-            border: 1px solid var(--toss-gray-200);
-            border-radius: 12px;
-            padding: 20px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            overflow-x: auto;
-            max-height: 400px;
-            overflow-y: auto;
-            color: var(--toss-gray-800);
-        }
-        
-        .query-section {
-            background: var(--toss-gray-50);
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid var(--toss-gray-200);
-        }
-        
-        .query-input {
-            width: 100%;
-            min-height: 120px;
-            padding: 16px;
-            border: 1px solid var(--toss-gray-300);
-            border-radius: 8px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: vertical;
-            background: var(--white);
-            color: var(--toss-gray-800);
-        }
-        
-        .query-input:focus {
-            outline: none;
-            border-color: var(--toss-blue);
-            box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.1);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--toss-gray-600);
-            font-size: 14px;
-        }
-        
-        .error {
-            background: var(--toss-light-red);
-            color: var(--toss-red);
-            padding: 16px;
-            border-radius: 8px;
-            margin: 16px 0;
-            font-size: 14px;
-            border: 1px solid var(--toss-red);
-        }
-        
-        .success {
-            background: #E8F5E8;
-            color: #2E7D2E;
-            padding: 16px;
-            border-radius: 8px;
-            margin: 16px 0;
-            font-size: 14px;
-            border: 1px solid #4CAF50;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 24px 0;
-        }
-        
-        .pagination button {
-            padding: 8px 12px;
-            border: 1px solid var(--toss-gray-300);
-            background: var(--white);
-            color: var(--toss-gray-700);
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-        
-        .pagination button.active {
-            background: var(--toss-blue);
-            color: var(--white);
-            border-color: var(--toss-blue);
-        }
-        
-        .pagination button:hover:not(.active) {
-            background: var(--toss-gray-50);
-            border-color: var(--toss-blue);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--toss-gray-600);
-        }
-        
-        .empty-state h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .empty-state p {
-            font-size: 14px;
-        }
+      :root {
+        --toss-blue: #0064ff;
+        --toss-light-blue: #e5f2ff;
+        --toss-red: #ff5a5a;
+        --toss-light-red: #ffebeb;
+        --toss-gray-900: #191f28;
+        --toss-gray-800: #333d4b;
+        --toss-gray-700: #4e5968;
+        --toss-gray-600: #6b7684;
+        --toss-gray-500: #8b95a1;
+        --toss-gray-400: #b0b8c1;
+        --toss-gray-300: #c9cdd2;
+        --toss-gray-200: #e5e8eb;
+        --toss-gray-100: #f2f4f6;
+        --toss-gray-50: #f9fafb;
+        --white: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+        background-color: var(--toss-gray-50);
+        color: var(--toss-gray-900);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .header {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--toss-gray-200);
+      }
+
+      .header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--toss-gray-900);
+        margin-bottom: 8px;
+      }
+
+      .header p {
+        font-size: 16px;
+        color: var(--toss-gray-600);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        background: var(--white);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .stat-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        transform: translateY(-1px);
+      }
+
+      .stat-card h3 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--toss-blue);
+        margin-bottom: 4px;
+      }
+
+      .stat-card p {
+        font-size: 14px;
+        color: var(--toss-gray-600);
+      }
+
+      .section {
+        background: var(--white);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+      }
+
+      .section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--toss-gray-900);
+        margin-bottom: 24px;
+      }
+
+      .table-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .table-card {
+        background: var(--toss-gray-50);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .table-card:hover {
+        background: var(--toss-light-blue);
+        border-color: var(--toss-blue);
+        transform: translateY(-1px);
+      }
+
+      .table-card.selected {
+        background: var(--toss-light-blue);
+        border-color: var(--toss-blue);
+      }
+
+      .table-card h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--toss-gray-900);
+        margin-bottom: 4px;
+      }
+
+      .table-card .row-count {
+        font-size: 14px;
+        color: var(--toss-gray-600);
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-primary {
+        background: var(--toss-blue);
+        color: var(--white);
+      }
+
+      .btn-primary:hover {
+        background: #0052cc;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: var(--toss-gray-100);
+        color: var(--toss-gray-700);
+        border: 1px solid var(--toss-gray-300);
+      }
+
+      .btn-secondary:hover {
+        background: var(--toss-gray-200);
+        transform: translateY(-1px);
+      }
+
+      .btn-danger {
+        background: var(--toss-red);
+        color: var(--white);
+      }
+
+      .btn-danger:hover {
+        background: #e54545;
+        transform: translateY(-1px);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: var(--white);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 12px;
+        background: var(--white);
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--toss-gray-200);
+        white-space: nowrap;
+        min-width: 120px;
+      }
+
+      .data-table td {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .data-table td.expandable {
+        white-space: normal;
+        word-wrap: break-word;
+      }
+
+      .data-table th {
+        background: var(--toss-gray-50);
+        color: var(--toss-gray-800);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .data-table td {
+        font-size: 14px;
+        color: var(--toss-gray-700);
+      }
+
+      .cell-content {
+        position: relative;
+        cursor: pointer;
+      }
+
+      .cell-content:hover {
+        background: var(--toss-light-blue);
+      }
+
+      .full-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--white);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 80vw;
+        max-height: 80vh;
+        overflow: auto;
+        z-index: 1000;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .full-content h3 {
+        margin-bottom: 16px;
+        color: var(--toss-gray-900);
+      }
+
+      .full-content pre {
+        background: var(--toss-gray-50);
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+
+      .data-table tbody tr:hover {
+        background: var(--toss-gray-50);
+      }
+
+      .data-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .json-display {
+        background: var(--toss-gray-50);
+        border: 1px solid var(--toss-gray-200);
+        border-radius: 12px;
+        padding: 20px;
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+          "Consolas", monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+        color: var(--toss-gray-800);
+      }
+
+      .query-section {
+        background: var(--toss-gray-50);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--toss-gray-200);
+      }
+
+      .query-input {
+        width: 100%;
+        min-height: 120px;
+        padding: 16px;
+        border: 1px solid var(--toss-gray-300);
+        border-radius: 8px;
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+          "Consolas", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+        background: var(--white);
+        color: var(--toss-gray-800);
+      }
+
+      .query-input:focus {
+        outline: none;
+        border-color: var(--toss-blue);
+        box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.1);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: var(--toss-gray-600);
+        font-size: 14px;
+      }
+
+      .error {
+        background: var(--toss-light-red);
+        color: var(--toss-red);
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        font-size: 14px;
+        border: 1px solid var(--toss-red);
+      }
+
+      .success {
+        background: #e8f5e8;
+        color: #2e7d2e;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        font-size: 14px;
+        border: 1px solid #4caf50;
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: 24px 0;
+      }
+
+      .pagination button {
+        padding: 8px 12px;
+        border: 1px solid var(--toss-gray-300);
+        background: var(--white);
+        color: var(--toss-gray-700);
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .pagination button.active {
+        background: var(--toss-blue);
+        color: var(--white);
+        border-color: var(--toss-blue);
+      }
+
+      .pagination button:hover:not(.active) {
+        background: var(--toss-gray-50);
+        border-color: var(--toss-blue);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--toss-gray-600);
+      }
+
+      .empty-state h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .empty-state p {
+        font-size: 14px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>Database Admin</h1>
-            <p>데이터베이스 관리 패널 - 모든 테이블과 데이터를 한 곳에서 확인하세요</p>
+      <div class="header">
+        <h1>Database Admin</h1>
+        <p>
+          데이터베이스 관리 패널 - 모든 테이블과 데이터를 한 곳에서 확인하세요
+        </p>
+      </div>
+
+      <div class="content">
+        <!-- 통계 섹션 -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <h3 id="totalTables">-</h3>
+            <p>총 테이블 수</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="totalRows">-</h3>
+            <p>총 데이터 행 수</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="dbStatus">-</h3>
+            <p>데이터베이스 상태</p>
+          </div>
         </div>
-        
-        <div class="content">
-            <!-- 통계 섹션 -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <h3 id="totalTables">-</h3>
-                    <p>총 테이블 수</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="totalRows">-</h3>
-                    <p>총 데이터 행 수</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="dbStatus">-</h3>
-                    <p>데이터베이스 상태</p>
-                </div>
-            </div>
-            
-            <!-- 테이블 목록 -->
-            <div class="section">
-                <h2>테이블 목록</h2>
-                <div class="controls">
-                    <button class="btn btn-primary" onclick="loadTables()">새로고침</button>
-                    <button class="btn btn-secondary" onclick="loadAllData()">전체 데이터 보기</button>
-                </div>
-                <div class="table-list" id="tableList">
-                    <div class="loading">테이블 정보를 불러오는 중...</div>
-                </div>
-            </div>
-            
-            <!-- 선택된 테이블 데이터 -->
-            <div class="section" id="tableDataSection" style="display: none;">
-                <h2 id="tableDataTitle">테이블 데이터</h2>
-                <div class="controls">
-                    <button class="btn btn-primary" onclick="refreshTableData()">새로고침</button>
-                    <button class="btn btn-secondary" onclick="showTableInfo()">테이블 정보</button>
-                    <button class="btn btn-danger" onclick="clearTable()" id="clearTableBtn">데이터 삭제</button>
-                </div>
-                <div id="tableDataContent">
-                    <div class="loading">데이터를 불러오는 중...</div>
-                </div>
-                <div class="pagination" id="tablePagination" style="display: none;"></div>
-            </div>
-            
-            <!-- SQL 쿼리 실행 -->
-            <div class="section">
-                <h2>SQL 쿼리 실행</h2>
-                <div class="query-section">
-                    <textarea 
-                        class="query-input" 
-                        id="sqlQuery" 
-                        placeholder="SELECT * FROM your_table_name LIMIT 10;
+
+        <!-- 테이블 목록 -->
+        <div class="section">
+          <h2>테이블 목록</h2>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="loadTables()">
+              새로고침
+            </button>
+            <button class="btn btn-secondary" onclick="loadAllData()">
+              전체 데이터 보기
+            </button>
+          </div>
+          <div class="table-list" id="tableList">
+            <div class="loading">테이블 정보를 불러오는 중...</div>
+          </div>
+        </div>
+
+        <!-- 선택된 테이블 데이터 -->
+        <div class="section" id="tableDataSection" style="display: none">
+          <h2 id="tableDataTitle">테이블 데이터</h2>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="refreshTableData()">
+              새로고침
+            </button>
+            <button class="btn btn-secondary" onclick="showTableInfo()">
+              테이블 정보
+            </button>
+            <button
+              class="btn btn-danger"
+              onclick="clearTable()"
+              id="clearTableBtn"
+            >
+              데이터 삭제
+            </button>
+          </div>
+          <div id="tableDataContent">
+            <div class="loading">데이터를 불러오는 중...</div>
+          </div>
+          <div
+            class="pagination"
+            id="tablePagination"
+            style="display: none"
+          ></div>
+        </div>
+
+        <!-- SQL 쿼리 실행 -->
+        <div class="section">
+          <h2>SQL 쿼리 실행</h2>
+          <div class="query-section">
+            <textarea
+              class="query-input"
+              id="sqlQuery"
+              placeholder="SELECT * FROM your_table_name LIMIT 10;
 
 예시 쿼리:
 - SELECT COUNT(*) FROM users;
 - SELECT * FROM sessions WHERE status = 'active';
 - SELECT sqlite_version();"
-                    ></textarea>
-                    <div style="margin-top: 16px;">
-                        <button class="btn btn-primary" onclick="executeQuery()">쿼리 실행</button>
-                        <button class="btn btn-secondary" onclick="clearQuery()">지우기</button>
-                    </div>
-                    <div id="queryResult"></div>
-                </div>
+            ></textarea>
+            <div style="margin-top: 16px">
+              <button class="btn btn-primary" onclick="executeQuery()">
+                쿼리 실행
+              </button>
+              <button class="btn btn-secondary" onclick="clearQuery()">
+                지우기
+              </button>
             </div>
+            <div id="queryResult"></div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        let currentTable = null;
-        let currentPage = 0;
-        let pageSize = 100;
-        
-        // 페이지 로드 시 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            loadStats();
-            loadTables();
-        });
-        
-        // 통계 정보 로드
-        async function loadStats() {
-            try {
-                const response = await fetch('/debug/db-stats');
-                const data = await response.json();
-                
-                document.getElementById('totalTables').textContent = data.total_tables;
-                document.getElementById('totalRows').textContent = data.total_rows.toLocaleString();
-                document.getElementById('dbStatus').textContent = '✅ 연결됨';
-            } catch (error) {
-                console.error('통계 로딩 실패:', error);
-                document.getElementById('dbStatus').textContent = '❌ 오류';
-            }
+      let currentTable = null;
+      let currentPage = 0;
+      let pageSize = 100;
+
+      // 페이지 로드 시 초기화
+      document.addEventListener("DOMContentLoaded", function () {
+        loadStats();
+        loadTables();
+      });
+
+      // 통계 정보 로드
+      async function loadStats() {
+        try {
+          const response = await fetch("/debug/db-stats");
+          const data = await response.json();
+
+          document.getElementById("totalTables").textContent =
+            data.total_tables;
+          document.getElementById("totalRows").textContent =
+            data.total_rows.toLocaleString();
+          document.getElementById("dbStatus").textContent = "✅ 연결됨";
+        } catch (error) {
+          console.error("통계 로딩 실패:", error);
+          document.getElementById("dbStatus").textContent = "❌ 오류";
         }
-        
-        // 테이블 목록 로드
-        async function loadTables() {
-            try {
-                const response = await fetch('/debug/tables');
-                const data = await response.json();
-                
-                const tableList = document.getElementById('tableList');
-                
-                if (data.tables.length === 0) {
-                    tableList.innerHTML = `
+      }
+
+      // 테이블 목록 로드
+      async function loadTables() {
+        try {
+          const response = await fetch("/debug/tables");
+          const data = await response.json();
+
+          const tableList = document.getElementById("tableList");
+
+          if (data.tables.length === 0) {
+            tableList.innerHTML = `
                         <div class="empty-state">
                             <h3>테이블이 없습니다</h3>
                             <p>데이터베이스 마이그레이션을 실행해주세요</p>
                         </div>
                     `;
-                    return;
-                }
-                
-                tableList.innerHTML = '';
-                
-                for (const tableName of data.tables) {
-                    // 각 테이블의 행 수 가져오기
-                    try {
-                        const tableResponse = await fetch(`/debug/tables/${tableName}`);
-                        const tableData = await tableResponse.json();
-                        
-                        const tableCard = document.createElement('div');
-                        tableCard.className = 'table-card';
-                        tableCard.onclick = () => selectTable(tableName);
-                        tableCard.innerHTML = `
+            return;
+          }
+
+          tableList.innerHTML = "";
+
+          for (const tableName of data.tables) {
+            // 각 테이블의 행 수 가져오기
+            try {
+              const tableResponse = await fetch(`/debug/tables/${tableName}`);
+              const tableData = await tableResponse.json();
+
+              const tableCard = document.createElement("div");
+              tableCard.className = "table-card";
+              tableCard.onclick = () => selectTable(tableName);
+              tableCard.innerHTML = `
                             <h4>📊 ${tableName}</h4>
                             <div class="row-count">${tableData.row_count.toLocaleString()} 행</div>
                         `;
-                        
-                        tableList.appendChild(tableCard);
-                    } catch (error) {
-                        const tableCard = document.createElement('div');
-                        tableCard.className = 'table-card';
-                        tableCard.onclick = () => selectTable(tableName);
-                        tableCard.innerHTML = `
+
+              tableList.appendChild(tableCard);
+            } catch (error) {
+              const tableCard = document.createElement("div");
+              tableCard.className = "table-card";
+              tableCard.onclick = () => selectTable(tableName);
+              tableCard.innerHTML = `
                             <h4>📊 ${tableName}</h4>
                             <div class="row-count">정보 불러오기 실패</div>
                         `;
-                        tableList.appendChild(tableCard);
-                    }
-                }
-                
-                // 통계 새로고침
-                loadStats();
-            } catch (error) {
-                console.error('테이블 로딩 실패:', error);
-                document.getElementById('tableList').innerHTML = 
-                    '<div class="error">테이블 정보를 불러오는데 실패했습니다.</div>';
+              tableList.appendChild(tableCard);
             }
+          }
+
+          // 통계 새로고침
+          loadStats();
+        } catch (error) {
+          console.error("테이블 로딩 실패:", error);
+          document.getElementById("tableList").innerHTML =
+            '<div class="error">테이블 정보를 불러오는데 실패했습니다.</div>';
         }
-        
-        // 테이블 선택
-        function selectTable(tableName) {
-            currentTable = tableName;
-            currentPage = 0;
-            
-            // 선택된 테이블 표시
-            document.querySelectorAll('.table-card').forEach(card => {
-                card.classList.remove('selected');
+      }
+
+      // 테이블 선택
+      function selectTable(tableName) {
+        currentTable = tableName;
+        currentPage = 0;
+
+        // 선택된 테이블 표시
+        document.querySelectorAll(".table-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+        event.target.classList.add("selected");
+
+        // 테이블 데이터 섹션 표시
+        document.getElementById("tableDataSection").style.display = "block";
+        document.getElementById(
+          "tableDataTitle"
+        ).textContent = `📊 ${tableName} 데이터`;
+        document.getElementById(
+          "clearTableBtn"
+        ).textContent = `🗑️ ${tableName} 데이터 삭제`;
+
+        loadTableData(tableName, currentPage);
+      }
+
+      // 테이블 데이터 로드
+      async function loadTableData(tableName, page = 0) {
+        try {
+          const response = await fetch(
+            `/debug/tables/${tableName}/data?limit=${pageSize}&offset=${
+              page * pageSize
+            }`
+          );
+          const data = await response.json();
+
+          const content = document.getElementById("tableDataContent");
+
+          if (data.data.length === 0) {
+            content.innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+            return;
+          }
+
+          // 테이블 생성
+          let html =
+            '<div class="table-container"><table class="data-table"><thead><tr>';
+
+          // 헤더
+          const columns = Object.keys(data.data[0]);
+          columns.forEach((col) => {
+            html += `<th>${col}</th>`;
+          });
+          html += "</tr></thead><tbody>";
+
+          // 데이터 행
+          data.data.forEach((row) => {
+            html += "<tr>";
+            columns.forEach((col) => {
+              let value = row[col];
+              let displayValue = value;
+              let isLong = false;
+
+              if (typeof value === "object" && value !== null) {
+                displayValue = JSON.stringify(value, null, 2);
+                isLong = displayValue.length > 100;
+              } else if (value === null) {
+                displayValue = "<em>NULL</em>";
+              } else if (typeof value === "string" && value.length > 100) {
+                displayValue = value.substring(0, 100) + "...";
+                isLong = true;
+              }
+
+              if (isLong) {
+                html += `<td class="expandable"><div class="cell-content" onclick="showFullContent('${col}', ${JSON.stringify(
+                  value
+                ).replace(/"/g, "&quot;")})">${displayValue}</div></td>`;
+              } else {
+                html += `<td>${displayValue}</td>`;
+              }
             });
-            event.target.classList.add('selected');
-            
-            // 테이블 데이터 섹션 표시
-            document.getElementById('tableDataSection').style.display = 'block';
-            document.getElementById('tableDataTitle').textContent = `📊 ${tableName} 데이터`;
-            document.getElementById('clearTableBtn').textContent = `🗑️ ${tableName} 데이터 삭제`;
-            
-            loadTableData(tableName, currentPage);
+            html += "</tr>";
+          });
+
+          html += "</tbody></table></div>";
+          content.innerHTML = html;
+
+          // 페이지네이션
+          createPagination(data.total_count, page);
+        } catch (error) {
+          console.error("테이블 데이터 로딩 실패:", error);
+          document.getElementById("tableDataContent").innerHTML =
+            '<div class="error">테이블 데이터를 불러오는데 실패했습니다.</div>';
         }
-        
-        // 테이블 데이터 로드
-        async function loadTableData(tableName, page = 0) {
-            try {
-                const response = await fetch(`/debug/tables/${tableName}/data?limit=${pageSize}&offset=${page * pageSize}`);
-                const data = await response.json();
-                
-                const content = document.getElementById('tableDataContent');
-                
-                if (data.data.length === 0) {
-                    content.innerHTML = '<div class="loading">데이터가 없습니다.</div>';
-                    return;
+      }
+
+      // 페이지네이션 생성
+      function createPagination(totalCount, currentPage) {
+        const totalPages = Math.ceil(totalCount / pageSize);
+        const pagination = document.getElementById("tablePagination");
+
+        if (totalPages <= 1) {
+          pagination.style.display = "none";
+          return;
+        }
+
+        pagination.style.display = "flex";
+        pagination.innerHTML = "";
+
+        // 이전 버튼
+        if (currentPage > 0) {
+          const prevBtn = document.createElement("button");
+          prevBtn.textContent = "이전";
+          prevBtn.onclick = () => {
+            this.currentPage = currentPage - 1;
+            loadTableData(this.currentTable, this.currentPage);
+          };
+          pagination.appendChild(prevBtn);
+        }
+
+        // 페이지 번호
+        const startPage = Math.max(0, currentPage - 2);
+        const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+          const pageBtn = document.createElement("button");
+          pageBtn.textContent = i + 1;
+          pageBtn.className = i === currentPage ? "active" : "";
+          pageBtn.onclick = () => {
+            this.currentPage = i;
+            loadTableData(this.currentTable, i);
+          };
+          pagination.appendChild(pageBtn);
+        }
+
+        // 다음 버튼
+        if (currentPage < totalPages - 1) {
+          const nextBtn = document.createElement("button");
+          nextBtn.textContent = "다음";
+          nextBtn.onclick = () => {
+            this.currentPage = currentPage + 1;
+            loadTableData(this.currentTable, this.currentPage);
+          };
+          pagination.appendChild(nextBtn);
+        }
+      }
+
+      // 테이블 데이터 새로고침
+      function refreshTableData() {
+        if (currentTable) {
+          loadTableData(currentTable, currentPage);
+        }
+      }
+
+      // 테이블 정보 보기
+      async function showTableInfo() {
+        if (!currentTable) return;
+
+        try {
+          const response = await fetch(`/debug/tables/${currentTable}`);
+          const data = await response.json();
+
+          const content = document.getElementById("tableDataContent");
+          content.innerHTML = `<div class="json-display">${JSON.stringify(
+            data,
+            null,
+            2
+          )}</div>`;
+        } catch (error) {
+          console.error("테이블 정보 로딩 실패:", error);
+        }
+      }
+
+      // 테이블 데이터 삭제
+      async function clearTable() {
+        if (!currentTable) return;
+
+        if (
+          !confirm(
+            `정말로 "${currentTable}" 테이블의 모든 데이터를 삭제하시겠습니까?`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`/debug/tables/${currentTable}`, {
+            method: "DELETE",
+          });
+          const result = await response.json();
+
+          document.getElementById(
+            "tableDataContent"
+          ).innerHTML = `<div class="success">${result.message}</div>`;
+
+          // 통계 새로고침
+          loadStats();
+          loadTables();
+        } catch (error) {
+          console.error("테이블 삭제 실패:", error);
+          document.getElementById("tableDataContent").innerHTML =
+            '<div class="error">테이블 데이터 삭제에 실패했습니다.</div>';
+        }
+      }
+
+      // SQL 쿼리 실행
+      async function executeQuery() {
+        const query = document.getElementById("sqlQuery").value.trim();
+
+        if (!query) {
+          alert("쿼리를 입력해주세요.");
+          return;
+        }
+
+        try {
+          const response = await fetch("/debug/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: query }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.detail || "쿼리 실행 실패");
+          }
+
+          const resultDiv = document.getElementById("queryResult");
+
+          if (data.data && data.data.length > 0) {
+            // 테이블 형태로 결과 표시
+            let html =
+              '<h3>쿼리 결과:</h3><div class="table-container"><table class="data-table"><thead><tr>';
+
+            data.columns.forEach((col) => {
+              html += `<th>${col}</th>`;
+            });
+            html += "</tr></thead><tbody>";
+
+            data.data.forEach((row) => {
+              html += "<tr>";
+              data.columns.forEach((col) => {
+                let value = row[col];
+                let displayValue = value;
+                let isLong = false;
+
+                if (typeof value === "object" && value !== null) {
+                  displayValue = JSON.stringify(value);
+                  isLong = displayValue.length > 100;
+                } else if (value === null) {
+                  displayValue = "<em>NULL</em>";
+                } else if (typeof value === "string" && value.length > 100) {
+                  displayValue = value.substring(0, 100) + "...";
+                  isLong = true;
                 }
-                
-                // 테이블 생성
-                let html = '<table class="data-table"><thead><tr>';
-                
-                // 헤더
-                const columns = Object.keys(data.data[0]);
-                columns.forEach(col => {
-                    html += `<th>${col}</th>`;
-                });
-                html += '</tr></thead><tbody>';
-                
-                // 데이터 행
-                data.data.forEach(row => {
-                    html += '<tr>';
-                    columns.forEach(col => {
-                        let value = row[col];
-                        if (typeof value === 'object' && value !== null) {
-                            value = JSON.stringify(value, null, 2);
-                        } else if (value === null) {
-                            value = '<em>NULL</em>';
-                        } else if (typeof value === 'string' && value.length > 100) {
-                            value = value.substring(0, 100) + '...';
-                        }
-                        html += `<td>${value}</td>`;
-                    });
-                    html += '</tr>';
-                });
-                
-                html += '</tbody></table>';
-                content.innerHTML = html;
-                
-                // 페이지네이션
-                createPagination(data.total_count, page);
-                
-            } catch (error) {
-                console.error('테이블 데이터 로딩 실패:', error);
-                document.getElementById('tableDataContent').innerHTML = 
-                    '<div class="error">테이블 데이터를 불러오는데 실패했습니다.</div>';
-            }
-        }
-        
-        // 페이지네이션 생성
-        function createPagination(totalCount, currentPage) {
-            const totalPages = Math.ceil(totalCount / pageSize);
-            const pagination = document.getElementById('tablePagination');
-            
-            if (totalPages <= 1) {
-                pagination.style.display = 'none';
-                return;
-            }
-            
-            pagination.style.display = 'flex';
-            pagination.innerHTML = '';
-            
-            // 이전 버튼
-            if (currentPage > 0) {
-                const prevBtn = document.createElement('button');
-                prevBtn.textContent = '이전';
-                prevBtn.onclick = () => {
-                    this.currentPage = currentPage - 1;
-                    loadTableData(this.currentTable, this.currentPage);
-                };
-                pagination.appendChild(prevBtn);
-            }
-            
-            // 페이지 번호
-            const startPage = Math.max(0, currentPage - 2);
-            const endPage = Math.min(totalPages - 1, currentPage + 2);
-            
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.textContent = i + 1;
-                pageBtn.className = i === currentPage ? 'active' : '';
-                pageBtn.onclick = () => {
-                    this.currentPage = i;
-                    loadTableData(this.currentTable, i);
-                };
-                pagination.appendChild(pageBtn);
-            }
-            
-            // 다음 버튼
-            if (currentPage < totalPages - 1) {
-                const nextBtn = document.createElement('button');
-                nextBtn.textContent = '다음';
-                nextBtn.onclick = () => {
-                    this.currentPage = currentPage + 1;
-                    loadTableData(this.currentTable, this.currentPage);
-                };
-                pagination.appendChild(nextBtn);
-            }
-        }
-        
-        // 테이블 데이터 새로고침
-        function refreshTableData() {
-            if (currentTable) {
-                loadTableData(currentTable, currentPage);
-            }
-        }
-        
-        // 테이블 정보 보기
-        async function showTableInfo() {
-            if (!currentTable) return;
-            
-            try {
-                const response = await fetch(`/debug/tables/${currentTable}`);
-                const data = await response.json();
-                
-                const content = document.getElementById('tableDataContent');
-                content.innerHTML = `<div class="json-display">${JSON.stringify(data, null, 2)}</div>`;
-                
-            } catch (error) {
-                console.error('테이블 정보 로딩 실패:', error);
-            }
-        }
-        
-        // 테이블 데이터 삭제
-        async function clearTable() {
-            if (!currentTable) return;
-            
-            if (!confirm(`정말로 "${currentTable}" 테이블의 모든 데이터를 삭제하시겠습니까?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/debug/tables/${currentTable}`, {
-                    method: 'DELETE'
-                });
-                const result = await response.json();
-                
-                document.getElementById('tableDataContent').innerHTML = 
-                    `<div class="success">${result.message}</div>`;
-                
-                // 통계 새로고침
-                loadStats();
-                loadTables();
-                
-            } catch (error) {
-                console.error('테이블 삭제 실패:', error);
-                document.getElementById('tableDataContent').innerHTML = 
-                    '<div class="error">테이블 데이터 삭제에 실패했습니다.</div>';
-            }
-        }
-        
-        // SQL 쿼리 실행
-        async function executeQuery() {
-            const query = document.getElementById('sqlQuery').value.trim();
-            
-            if (!query) {
-                alert('쿼리를 입력해주세요.');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/debug/query', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ query: query })
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.detail || '쿼리 실행 실패');
-                }
-                
-                const resultDiv = document.getElementById('queryResult');
-                
-                if (data.data && data.data.length > 0) {
-                    // 테이블 형태로 결과 표시
-                    let html = '<h3>쿼리 결과:</h3><table class="data-table"><thead><tr>';
-                    
-                    data.columns.forEach(col => {
-                        html += `<th>${col}</th>`;
-                    });
-                    html += '</tr></thead><tbody>';
-                    
-                    data.data.forEach(row => {
-                        html += '<tr>';
-                        data.columns.forEach(col => {
-                            let value = row[col];
-                            if (typeof value === 'object' && value !== null) {
-                                value = JSON.stringify(value);
-                            } else if (value === null) {
-                                value = '<em>NULL</em>';
-                            }
-                            html += `<td>${value}</td>`;
-                        });
-                        html += '</tr>';
-                    });
-                    
-                    html += '</tbody></table>';
-                    html += `<p style="margin-top: 10px; color: #6c757d;">총 ${data.row_count}개 행</p>`;
-                    
-                    resultDiv.innerHTML = html;
+
+                if (isLong) {
+                  html += `<td class="expandable"><div class="cell-content" onclick="showFullContent('${col}', ${JSON.stringify(
+                    value
+                  ).replace(/"/g, "&quot;")})">${displayValue}</div></td>`;
                 } else {
-                    resultDiv.innerHTML = `<div class="success">쿼리가 성공적으로 실행되었습니다.</div>`;
+                  html += `<td>${displayValue}</td>`;
                 }
-                
-            } catch (error) {
-                console.error('쿼리 실행 실패:', error);
-                document.getElementById('queryResult').innerHTML = 
-                    `<div class="error">쿼리 실행 실패: ${error.message}</div>`;
-            }
+              });
+              html += "</tr>";
+            });
+
+            html += "</tbody></table></div>";
+            html += `<p style="margin-top: 10px; color: #6c757d;">총 ${data.row_count}개 행</p>`;
+
+            resultDiv.innerHTML = html;
+          } else {
+            resultDiv.innerHTML = `<div class="success">쿼리가 성공적으로 실행되었습니다.</div>`;
+          }
+        } catch (error) {
+          console.error("쿼리 실행 실패:", error);
+          document.getElementById(
+            "queryResult"
+          ).innerHTML = `<div class="error">쿼리 실행 실패: ${error.message}</div>`;
         }
-        
-        // 쿼리 입력창 지우기
-        function clearQuery() {
-            document.getElementById('sqlQuery').value = '';
-            document.getElementById('queryResult').innerHTML = '';
+      }
+
+      // 쿼리 입력창 지우기
+      function clearQuery() {
+        document.getElementById("sqlQuery").value = "";
+        document.getElementById("queryResult").innerHTML = "";
+      }
+
+      // 전체 내용 보기
+      function showFullContent(columnName, content) {
+        // 기존 모달 제거
+        const existingModal = document.querySelector(".overlay");
+        if (existingModal) {
+          existingModal.remove();
         }
-        
-        // 모든 데이터 보기
-        function loadAllData() {
-            const content = document.getElementById('tableDataContent');
-            content.innerHTML = '<div class="loading">모든 테이블 데이터를 준비 중...</div>';
-            
-            document.getElementById('tableDataSection').style.display = 'block';
-            document.getElementById('tableDataTitle').textContent = '📊 전체 데이터베이스 개요';
-            
-            // 간단한 전체 통계 표시
-            fetch('/debug/db-stats')
-                .then(response => response.json())
-                .then(data => {
-                    let html = '<div class="json-display">';
-                    html += '<h3>📈 데이터베이스 통계</h3>';
-                    html += `<p><strong>데이터베이스 URL:</strong> ${data.database_url}</p>`;
-                    html += `<p><strong>총 테이블 수:</strong> ${data.total_tables}</p>`;
-                    html += `<p><strong>총 데이터 행 수:</strong> ${data.total_rows.toLocaleString()}</p>`;
-                    html += '<h4>테이블별 행 수:</h4><ul>';
-                    
-                    Object.entries(data.tables).forEach(([table, count]) => {
-                        html += `<li><strong>${table}:</strong> ${typeof count === 'number' ? count.toLocaleString() : count} 행</li>`;
-                    });
-                    
-                    html += '</ul></div>';
-                    content.innerHTML = html;
-                })
-                .catch(error => {
-                    content.innerHTML = '<div class="error">통계 정보를 불러오는데 실패했습니다.</div>';
-                });
+
+        // 오버레이 생성
+        const overlay = document.createElement("div");
+        overlay.className = "overlay";
+        overlay.onclick = () => overlay.remove();
+
+        // 모달 내용 생성
+        const modal = document.createElement("div");
+        modal.className = "full-content";
+        modal.onclick = (e) => e.stopPropagation();
+
+        let displayContent = content;
+        if (typeof content === "object" && content !== null) {
+          displayContent = JSON.stringify(content, null, 2);
         }
+
+        modal.innerHTML = `
+                <h3>📋 ${columnName} - 전체 내용</h3>
+                <pre>${displayContent}</pre>
+                <button class="btn btn-secondary" onclick="this.closest('.overlay').remove()" style="margin-top: 16px;">닫기</button>
+            `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+      }
+
+      // 모든 데이터 보기
+      function loadAllData() {
+        const content = document.getElementById("tableDataContent");
+        content.innerHTML =
+          '<div class="loading">모든 테이블 데이터를 준비 중...</div>';
+
+        document.getElementById("tableDataSection").style.display = "block";
+        document.getElementById("tableDataTitle").textContent =
+          "📊 전체 데이터베이스 개요";
+
+        // 간단한 전체 통계 표시
+        fetch("/debug/db-stats")
+          .then((response) => response.json())
+          .then((data) => {
+            let html = '<div class="json-display">';
+            html += "<h3>📈 데이터베이스 통계</h3>";
+            html += `<p><strong>데이터베이스 URL:</strong> ${data.database_url}</p>`;
+            html += `<p><strong>총 테이블 수:</strong> ${data.total_tables}</p>`;
+            html += `<p><strong>총 데이터 행 수:</strong> ${data.total_rows.toLocaleString()}</p>`;
+            html += "<h4>테이블별 행 수:</h4><ul>";
+
+            Object.entries(data.tables).forEach(([table, count]) => {
+              html += `<li><strong>${table}:</strong> ${
+                typeof count === "number" ? count.toLocaleString() : count
+              } 행</li>`;
+            });
+
+            html += "</ul></div>";
+            content.innerHTML = html;
+          })
+          .catch((error) => {
+            content.innerHTML =
+              '<div class="error">통계 정보를 불러오는데 실패했습니다.</div>';
+          });
+      }
     </script>
-</body>
+  </body>
 </html>
