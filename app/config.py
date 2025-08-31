@@ -1,6 +1,4 @@
 from pydantic_settings import BaseSettings
-from typing import List
-import os
 
 
 class Settings(BaseSettings):
@@ -17,9 +15,10 @@ class Settings(BaseSettings):
     # LLM Providers
     openai_api_key: str = ""
     anthropic_api_key: str = ""
+    gemini_api_key: str = ""
     
     # LLM Configuration
-    default_llm_provider: str = "openai"
+    default_llm_provider: str = "gemini"
     max_tokens_per_request: int = 4000
     llm_temperature: float = 0.7
     
