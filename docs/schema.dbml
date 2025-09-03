@@ -1,0 +1,78 @@
+Table levels {
+  level_code  text [pk]               // 'beginner' | 'intermediate' | 'expert'
+  name        text [not null]
+  description text
+}
+
+Table main_topics {
+  main_topic_id integer [pk, increment]
+  name          text [not null]
+  description   text
+}
+
+Table sub_topics {
+  sub_topic_id  integer [pk, increment]
+  main_topic_id integer [not null]
+  name          text [not null]
+  description   text
+  source_type   text [not null]       // 'curated' | 'generated'
+}
+
+Table learning_paths {
+  path_id      text [pk]
+  sub_topic_id integer [not null]
+  title        text [not null]
+  description  text
+  is_default   boolean                // 선택: 기본 경로 표시가 필요할 때만 사용
+}
+
+Table curriculum_items {
+  curriculum_item_id text [pk]
+  sub_topic_id       integer [not null]
+  path_id            text [not null]
+  title              text [not null]
+  sort_order         int   [not null]
+  Indexes {
+    (path_id, sort_order) [unique]    // 경로 내부에서 순서 고유
+    (sub_topic_id)
+  }
+}
+
+Table articles {
+  article_id         text [pk]
+  curriculum_item_id text [not null]
+  sub_topic_id       integer [not null]
+  level_code         text [not null]   // FK to levels.level_code
+  title              text [not null]
+  body               text [not null]
+  Indexes {
+    (sub_topic_id, level_code)
+    (curriculum_item_id, level_code) [unique]   // 아이템 × 레벨 당 1개 본문
+  }
+}
+
+Table users {
+  user_id   text [pk]
+  nickname  text [not null]
+  email     text [unique]
+}
+
+Table user_article_reads {
+  user_id    text [not null]
+  article_id text [not null]
+  read_at    datetime
+  Indexes {
+    (user_id, article_id) [unique]     // 존재=읽음
+    (user_id, read_at)
+  }
+}
+
+Ref: sub_topics.main_topic_id > main_topics.main_topic_id
+Ref: learning_paths.sub_topic_id > sub_topics.sub_topic_id
+Ref: curriculum_items.sub_topic_id > sub_topics.sub_topic_id
+Ref: curriculum_items.path_id > learning_paths.path_id
+Ref: articles.curriculum_item_id > curriculum_items.curriculum_item_id
+Ref: articles.sub_topic_id > sub_topics.sub_topic_id
+Ref: articles.level_code > levels.level_code
+Ref: user_article_reads.user_id > users.user_id
+Ref: user_article_reads.article_id > articles.article_id
