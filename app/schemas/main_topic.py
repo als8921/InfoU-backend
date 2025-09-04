@@ -5,9 +5,8 @@ from datetime import datetime
 
 class MainTopicBase(BaseModel):
     """MainTopic 기본 스키마"""
-    title: str
+    name: str
     description: Optional[str] = None
-    is_active: bool = True
 
 
 class MainTopicCreate(MainTopicBase):
@@ -17,16 +16,13 @@ class MainTopicCreate(MainTopicBase):
 
 class MainTopicUpdate(BaseModel):
     """MainTopic 업데이트 스키마"""
-    title: Optional[str] = None
+    name: Optional[str] = None
     description: Optional[str] = None
-    is_active: Optional[bool] = None
 
 
 class MainTopicResponse(MainTopicBase):
     """MainTopic 응답 스키마"""
-    id: int
-    created_at: datetime
-    updated_at: datetime
+    main_topic_id: int
     
     model_config = ConfigDict(from_attributes=True)
 

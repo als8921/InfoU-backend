@@ -2,7 +2,19 @@
 from .user import User
 from .level import Level
 from .main_topic import MainTopic
-from .curated_sub_topic import CuratedSubTopic
-from .generated_sub_topic import GeneratedSubTopic, SubTopicGenerationRequest
+from .sub_topic import SubTopic
+from .learning_path import LearningPath
+from .curriculum_item import CurriculumItem
+from .article import Article
+from .user_article_read import UserArticleRead
 
-__all__ = ["User", "Level", "MainTopic", "CuratedSubTopic", "GeneratedSubTopic", "SubTopicGenerationRequest"]
+__all__ = [
+    "User", 
+    "Level", 
+    "MainTopic", 
+    "SubTopic", 
+    "LearningPath", 
+    "CurriculumItem", 
+    "Article", 
+    "UserArticleRead"
+]

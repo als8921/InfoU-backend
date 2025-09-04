@@ -2,22 +2,11 @@
 from .user import *
 from .level import *
 from .main_topic import *
-from .curated_sub_topic import *
-from .generated_sub_topic import *
 
 __all__ = [
     # Level schemas
     "LevelBase", "LevelCreate", "LevelUpdate", "LevelResponse", "LevelWithStats",
     # MainTopic schemas
     "MainTopicBase", "MainTopicCreate", "MainTopicUpdate", "MainTopicResponse", 
-    "MainTopicWithLevel", "MainTopicWithStats",
-    # CuratedSubTopic schemas
-    "CuratedSubTopicBase", "CuratedSubTopicCreate", "CuratedSubTopicUpdate",
-    "CuratedSubTopicResponse", "CuratedSubTopicWithRelations",
-    # GeneratedSubTopic schemas
-    "GeneratedSubTopicBase", "GeneratedSubTopicCreate", "GeneratedSubTopicResponse",
-    "SubTopicGenerationRequestCreate", "SubTopicGenerationRequestResponse",
-    "PersonalizationData", "GenerationParameters", "SubTopicGenerationResult",
-    # Pagination schemas
-    "PaginationParams", "PaginatedResponse"
+    "MainTopicWithStats",
 ]

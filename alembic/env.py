@@ -21,7 +21,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from app.database.database import Base
-from app.models import User, Level, MainTopic, CuratedSubTopic
+from app.models import User, Level, MainTopic, SubTopic, LearningPath, CurriculumItem, Article, UserArticleRead
 
 target_metadata = Base.metadata
 

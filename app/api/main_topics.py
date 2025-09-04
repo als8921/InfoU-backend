@@ -1,11 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import Optional
+from typing import Optional, Any, List
+from pydantic import BaseModel
 from app.database.database import get_db
-from app.models import MainTopic, CuratedSubTopic
+from app.models import MainTopic, SubTopic
 from app.schemas.main_topic import MainTopicResponse, MainTopicWithStats
-from app.schemas.curated_sub_topic import PaginatedResponse
+
+class PaginatedResponse(BaseModel):
+    items: List[Any]
+    total: int
+    page: int
+    size: int
+    pages: int
+    has_next: bool
+    has_prev: bool
 
 router = APIRouter(
     prefix="/main-topics",
@@ -27,11 +36,9 @@ async def get_main_topics(
     """
     query = db.query(MainTopic)
     
-    # 필터링
-    if is_active is not None:
-        query = query.filter(MainTopic.is_active == is_active)
+    # 필터링 - 새 스키마에는 is_active가 없으므로 제거
     if search:
-        query = query.filter(MainTopic.title.contains(search))
+        query = query.filter(MainTopic.name.contains(search))
     
     # 전체 개수 계산
     total = query.count()
@@ -66,25 +73,21 @@ async def get_main_topic(
     특정 대주제 상세 조회
     """
     topic = db.query(MainTopic).filter(
-        MainTopic.id == topic_id
+        MainTopic.main_topic_id == topic_id
     ).first()
     
     if not topic:
         raise HTTPException(status_code=404, detail="Main topic not found")
     
-    # 큐레이션 소주제 개수 계산
-    sub_topics_count = db.query(CuratedSubTopic).filter(
-        CuratedSubTopic.main_topic_id == topic.id,
-        CuratedSubTopic.is_active == True
+    # 소주제 개수 계산
+    sub_topics_count = db.query(SubTopic).filter(
+        SubTopic.main_topic_id == topic.main_topic_id
     ).count()
     
     topic_dict = {
-        "id": topic.id,
-        "title": topic.title,
+        "id": topic.main_topic_id,
+        "title": topic.name,
         "description": topic.description,
-        "is_active": topic.is_active,
-        "created_at": topic.created_at,
-        "updated_at": topic.updated_at,
         "curated_sub_topics_count": sub_topics_count
     }
     return MainTopicWithStats(**topic_dict)
