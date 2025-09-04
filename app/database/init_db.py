@@ -1,5 +1,5 @@
 from app.database.database import engine, Base
-from app.models.user import User
+from app.models import User, Level, MainTopic, SubTopic, LearningPath, CurriculumItem, Article, UserArticleRead
 
 def init_db():
     """데이터베이스 테이블을 생성합니다."""
