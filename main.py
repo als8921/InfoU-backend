@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 
 # API 라우터들
-from app.api import health, debug, web, topics, learning_paths, articles, reading
+from app.api import health, debug, web, topics, learning_paths, articles, reading, curriculum_items, levels
 
 app = FastAPI(
     title=settings.app_name,
@@ -30,8 +30,10 @@ app.include_router(debug.router)
 # MVP API 라우터 등록
 app.include_router(topics.router)
 app.include_router(learning_paths.router)
+app.include_router(curriculum_items.router)
 app.include_router(articles.router)
 app.include_router(reading.router)
+app.include_router(levels.router)
 
 # 루트 경로는 web.router에서 처리
 

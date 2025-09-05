@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional
@@ -7,7 +7,7 @@ from app.models import Article, UserArticleRead, User, CurriculumItem, LearningP
 from pydantic import BaseModel
 from datetime import datetime
 
-router = APIRouter(prefix="/api", tags=["MVP Reading Management"])
+router = APIRouter(prefix="/api", tags=["UserArticleRead"])
 
 # Response Models
 class ReadResponse(BaseModel):
@@ -78,7 +78,7 @@ async def mark_article_read(
 @router.get("/users/{user_id}/progress", response_model=ProgressResponse)
 async def get_user_progress(
     user_id: str,
-    sub_topic_id: Optional[int] = None,
+    sub_topic_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     authorization: str = Header()
 ):

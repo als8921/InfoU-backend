@@ -5,7 +5,7 @@ from app.database.database import get_db
 from app.models import MainTopic, SubTopic
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/api", tags=["MVP Topics"])
+router = APIRouter(prefix="/api", tags=["MainTopic & SubTopic"])
 
 # Response Models
 class MainTopicResponse(BaseModel):
@@ -29,6 +29,7 @@ class GenerateSubTopicResponse(BaseModel):
     source_type: str = "generated"
 
 
+# MainTopic APIs
 @router.get("/main-topics", response_model=List[MainTopicResponse])
 async def get_main_topics(db: Session = Depends(get_db)):
     """대주제 목록 조회"""
@@ -43,6 +44,7 @@ async def get_main_topics(db: Session = Depends(get_db)):
     ]
 
 
+# SubTopic APIs
 @router.get("/main-topics/{main_topic_id}/sub-topics", response_model=List[SubTopicResponse])
 async def get_sub_topics(main_topic_id: int, db: Session = Depends(get_db)):
     """소주제 목록 조회"""
