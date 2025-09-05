@@ -3,9 +3,19 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text, inspect
 from typing import Dict, Any, List
 import json
+import uuid
+from datetime import datetime
 
 from app.database.database import get_db, engine
 from app.config import settings
+from app.models.user import User
+from app.models.level import Level
+from app.models.main_topic import MainTopic
+from app.models.sub_topic import SubTopic
+from app.models.learning_path import LearningPath
+from app.models.curriculum_item import CurriculumItem
+from app.models.article import Article
+from app.models.user_article_read import UserArticleRead
 
 router = APIRouter(
     prefix="/debug",
@@ -147,62 +157,6 @@ async def get_table_data(
         raise HTTPException(status_code=500, detail=f"Error fetching table data: {str(e)}")
 
 
-@router.post("/query", dependencies=[Depends(is_debug_enabled)])
-async def execute_query(
-    query_data: Dict[str, str],
-    db: Session = Depends(get_db)
-) -> Dict[str, Any]:
-    """SQL 쿼리 직접 실행 (SELECT만 허용)"""
-    try:
-        query = query_data.get("query", "").strip()
-        
-        if not query:
-            raise HTTPException(status_code=400, detail="Query is required")
-        
-        # 보안을 위해 SELECT 쿼리만 허용
-        if not query.upper().startswith("SELECT"):
-            raise HTTPException(
-                status_code=400, 
-                detail="Only SELECT queries are allowed for security reasons"
-            )
-        
-        result = db.execute(text(query))
-        
-        if result.returns_rows:
-            columns = result.keys()
-            rows = result.fetchall()
-            
-            data = []
-            for row in rows:
-                row_dict = {}
-                for i, col in enumerate(columns):
-                    value = row[i]
-                    # JSON 문자열인 경우 파싱 시도
-                    if isinstance(value, str) and (value.startswith('{') or value.startswith('[')):
-                        try:
-                            value = json.loads(value)
-                        except:
-                            pass
-                    row_dict[col] = value
-                data.append(row_dict)
-            
-            return {
-                "query": query,
-                "columns": list(columns),
-                "row_count": len(data),
-                "data": data
-            }
-        else:
-            return {
-                "query": query,
-                "message": "Query executed successfully (no rows returned)"
-            }
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error executing query: {str(e)}")
-
 
 @router.get("/db-stats", dependencies=[Depends(is_debug_enabled)])
 async def get_database_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
@@ -258,3 +212,280 @@ async def clear_table(table_name: str, db: Session = Depends(get_db)) -> Dict[st
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error clearing table: {str(e)}")
+
+
+# 데이터 생성 API 엔드포인트들
+
+@router.post("/data/users", dependencies=[Depends(is_debug_enabled)])
+async def create_user(user_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """사용자 데이터 생성"""
+    try:
+        user = User(
+            user_id=user_data.get("user_id") or str(uuid.uuid4()),
+            nickname=user_data["nickname"],
+            email=user_data.get("email")
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "message": "User created successfully",
+            "data": {
+                "user_id": user.user_id,
+                "nickname": user.nickname,
+                "email": user.email
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating user: {str(e)}")
+
+
+@router.post("/data/levels", dependencies=[Depends(is_debug_enabled)])
+async def create_level(level_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """난이도 데이터 생성"""
+    try:
+        level = Level(
+            level_code=level_data["level_code"],
+            name=level_data["name"],
+            description=level_data.get("description")
+        )
+        db.add(level)
+        db.commit()
+        db.refresh(level)
+        
+        return {
+            "message": "Level created successfully",
+            "data": {
+                "level_code": level.level_code,
+                "name": level.name,
+                "description": level.description
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating level: {str(e)}")
+
+
+@router.post("/data/main-topics", dependencies=[Depends(is_debug_enabled)])
+async def create_main_topic(topic_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """메인 토픽 데이터 생성"""
+    try:
+        main_topic = MainTopic(
+            name=topic_data["name"],
+            description=topic_data.get("description")
+        )
+        db.add(main_topic)
+        db.commit()
+        db.refresh(main_topic)
+        
+        return {
+            "message": "Main topic created successfully",
+            "data": {
+                "main_topic_id": main_topic.main_topic_id,
+                "name": main_topic.name,
+                "description": main_topic.description
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating main topic: {str(e)}")
+
+
+@router.post("/data/sub-topics", dependencies=[Depends(is_debug_enabled)])
+async def create_sub_topic(topic_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """서브 토픽 데이터 생성"""
+    try:
+        sub_topic = SubTopic(
+            main_topic_id=topic_data["main_topic_id"],
+            name=topic_data["name"],
+            description=topic_data.get("description"),
+            source_type=topic_data.get("source_type", "curated")
+        )
+        db.add(sub_topic)
+        db.commit()
+        db.refresh(sub_topic)
+        
+        return {
+            "message": "Sub topic created successfully",
+            "data": {
+                "sub_topic_id": sub_topic.sub_topic_id,
+                "main_topic_id": sub_topic.main_topic_id,
+                "name": sub_topic.name,
+                "description": sub_topic.description,
+                "source_type": sub_topic.source_type
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating sub topic: {str(e)}")
+
+
+@router.post("/data/learning-paths", dependencies=[Depends(is_debug_enabled)])
+async def create_learning_path(path_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """학습 경로 데이터 생성"""
+    try:
+        learning_path = LearningPath(
+            path_id=path_data.get("path_id") or str(uuid.uuid4()),
+            sub_topic_id=path_data["sub_topic_id"],
+            title=path_data["title"],
+            description=path_data.get("description"),
+            is_default=path_data.get("is_default", False)
+        )
+        db.add(learning_path)
+        db.commit()
+        db.refresh(learning_path)
+        
+        return {
+            "message": "Learning path created successfully",
+            "data": {
+                "path_id": learning_path.path_id,
+                "sub_topic_id": learning_path.sub_topic_id,
+                "title": learning_path.title,
+                "description": learning_path.description,
+                "is_default": learning_path.is_default
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating learning path: {str(e)}")
+
+
+@router.post("/data/curriculum-items", dependencies=[Depends(is_debug_enabled)])
+async def create_curriculum_item(item_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """커리큘럼 아이템 데이터 생성"""
+    try:
+        curriculum_item = CurriculumItem(
+            curriculum_item_id=item_data.get("curriculum_item_id") or str(uuid.uuid4()),
+            sub_topic_id=item_data["sub_topic_id"],
+            path_id=item_data["path_id"],
+            title=item_data["title"],
+            sort_order=item_data["sort_order"]
+        )
+        db.add(curriculum_item)
+        db.commit()
+        db.refresh(curriculum_item)
+        
+        return {
+            "message": "Curriculum item created successfully",
+            "data": {
+                "curriculum_item_id": curriculum_item.curriculum_item_id,
+                "sub_topic_id": curriculum_item.sub_topic_id,
+                "path_id": curriculum_item.path_id,
+                "title": curriculum_item.title,
+                "sort_order": curriculum_item.sort_order
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating curriculum item: {str(e)}")
+
+
+@router.post("/data/articles", dependencies=[Depends(is_debug_enabled)])
+async def create_article(article_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """아티클 데이터 생성"""
+    try:
+        article = Article(
+            article_id=article_data.get("article_id") or str(uuid.uuid4()),
+            curriculum_item_id=article_data["curriculum_item_id"],
+            sub_topic_id=article_data["sub_topic_id"],
+            level_code=article_data["level_code"],
+            title=article_data["title"],
+            body=article_data["body"]
+        )
+        db.add(article)
+        db.commit()
+        db.refresh(article)
+        
+        return {
+            "message": "Article created successfully",
+            "data": {
+                "article_id": article.article_id,
+                "curriculum_item_id": article.curriculum_item_id,
+                "sub_topic_id": article.sub_topic_id,
+                "level_code": article.level_code,
+                "title": article.title,
+                "body": article.body[:100] + "..." if len(article.body) > 100 else article.body
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating article: {str(e)}")
+
+
+@router.post("/data/user-article-reads", dependencies=[Depends(is_debug_enabled)])
+async def create_user_article_read(read_data: Dict[str, Any], db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """사용자 아티클 읽기 기록 생성"""
+    try:
+        user_read = UserArticleRead(
+            user_id=read_data["user_id"],
+            article_id=read_data["article_id"],
+            read_at=datetime.fromisoformat(read_data.get("read_at", datetime.now().isoformat()))
+        )
+        db.add(user_read)
+        db.commit()
+        db.refresh(user_read)
+        
+        return {
+            "message": "User article read record created successfully",
+            "data": {
+                "user_id": user_read.user_id,
+                "article_id": user_read.article_id,
+                "read_at": user_read.read_at.isoformat() if user_read.read_at else None
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error creating user article read: {str(e)}")
+
+
+# 참조 데이터 조회를 위한 헬퍼 엔드포인트들
+
+@router.get("/reference/main-topics", dependencies=[Depends(is_debug_enabled)])
+async def get_main_topics_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """메인 토픽 참조 데이터"""
+    topics = db.query(MainTopic).all()
+    return [{"id": t.main_topic_id, "name": t.name} for t in topics]
+
+
+@router.get("/reference/sub-topics", dependencies=[Depends(is_debug_enabled)])
+async def get_sub_topics_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """서브 토픽 참조 데이터"""
+    topics = db.query(SubTopic).all()
+    return [{"id": t.sub_topic_id, "name": t.name, "main_topic_id": t.main_topic_id} for t in topics]
+
+
+@router.get("/reference/learning-paths", dependencies=[Depends(is_debug_enabled)])
+async def get_learning_paths_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """학습 경로 참조 데이터"""
+    paths = db.query(LearningPath).all()
+    return [{"id": p.path_id, "title": p.title, "sub_topic_id": p.sub_topic_id} for p in paths]
+
+
+@router.get("/reference/curriculum-items", dependencies=[Depends(is_debug_enabled)])
+async def get_curriculum_items_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """커리큘럼 아이템 참조 데이터"""
+    items = db.query(CurriculumItem).all()
+    return [{"id": i.curriculum_item_id, "title": i.title, "sub_topic_id": i.sub_topic_id} for i in items]
+
+
+@router.get("/reference/levels", dependencies=[Depends(is_debug_enabled)])
+async def get_levels_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """레벨 참조 데이터"""
+    levels = db.query(Level).all()
+    return [{"code": l.level_code, "name": l.name} for l in levels]
+
+
+@router.get("/reference/users", dependencies=[Depends(is_debug_enabled)])
+async def get_users_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """사용자 참조 데이터"""
+    users = db.query(User).all()
+    return [{"id": u.user_id, "nickname": u.nickname} for u in users]
+
+
+@router.get("/reference/articles", dependencies=[Depends(is_debug_enabled)])
+async def get_articles_reference(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    """아티클 참조 데이터"""
+    articles = db.query(Article).all()
+    return [{"id": a.article_id, "title": a.title, "level_code": a.level_code} for a in articles]
